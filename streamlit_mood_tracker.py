@@ -1,48 +1,31 @@
+import json
 import altair as alt
 from altair import datum
 import streamlit as st
 
-import os
 import gspread
 import pandas as pd
 from datetime import datetime, timedelta
 from gspread_dataframe import get_as_dataframe
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-
-GOOGLE_API_SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-CREDS_FILE = '.env/credentials.json'
-TOKEN_FILE = '.env/token.json'
+from google.oauth2.service_account import Credentials
 
 
-def authenticate_google_sheets():
+
+GOOGLE_API_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+
+def authenticate_google_sheets() -> gspread.Client:
     """
-    Authenticate the Google Sheets API client using OAuth2 credentials.
-    If the credentials are not valid or do not exist, it will prompt the user to log in.
+    Authenticate and return a Google Sheets client using service account credentials.
+    This function uses the credentials stored in Streamlit secrets to authorize access to Google Sheets.
+    :return: gspread client object.
     """
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(
-            filename=TOKEN_FILE,
-            scopes=GOOGLE_API_SCOPES
-        )
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                client_secrets_file=CREDS_FILE,
-                scopes=GOOGLE_API_SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-        
-        with open(TOKEN_FILE, 'w') as token:
-            token.write(creds.to_json())
-    
-    google_client = gspread.authorize(credentials=creds)
-    return google_client
+    creds_info = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
+    creds = Credentials.from_service_account_info(creds_info, scopes=GOOGLE_API_SCOPES)
+    client = gspread.authorize(creds)
+    return client
 
 
 def built_altair_charts(
