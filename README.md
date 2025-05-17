@@ -2,6 +2,7 @@
 Takehome assessment for Mochi Health
 
 In the `streamlit_mood_tracker.py` we create a streamlit app which tracks and visualizes customers survey responses about their mood.
+The app has been deployed publicly here [hunter-lybbert-mochi-takehome.streamlit.app](https://hunter-lybbert-mochi-takehome.streamlit.app/).
 * We first have to authenticate to google sheets to access the location which the data is being stored.
 Specifically our application is backed by [this google sheet](https://docs.google.com/spreadsheets/d/1UptyEDla8n5vaEa6fHjVJyqPUw1k43riLJm6Lm_Xx4Y/edit?gid=0#gid=0).
 * Secondly we record the users input to the streamlit widgets.
